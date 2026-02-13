@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valentine Buat Ipaww 💖</title>
+  <style>
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-family: 'Comic Sans MS', cursive, system-ui, sans-serif;
+      background: linear-gradient(135deg, #ff9ecf, #ffc3e6);
+      text-align:center;
+      overflow:hidden;
+    }
+    .card{
+      position:relative;
+      background: rgba(255,255,255,0.92);
+      padding:25px;
+      border-radius:20px;
+      width:90%;
+      max-width:520px;
+      box-shadow:0 15px 35px rgba(0,0,0,0.2);
+      z-index:2;
+    }
+    h1{
+      margin:0 0 10px;
+      font-size:26px;
+      color:#ff2f7b;
+    }
+    p{
+      font-size:16px;
+      line-height:1.6;
+      white-space:pre-line;
+    }
+    .emoji{
+      font-size:22px;
+    }
+    .btns{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    button{
+      padding:10px 15px;
+      border:none;
+      border-radius:999px;
+      background:#ff2f7b;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease;
+      user-select:none;
+    }
+    button:hover{ filter: brightness(1.05); }
+    button:active{ transform: scale(0.92) rotate(-2deg); }
+    .wa{ background:#25D366; }
+
+    /* Efek "goyang lucu" saat tombol ditekan (ditambah kelas via JS) */
+    .wiggle{
+      animation: wiggle .45s ease;
+    }
+    @keyframes wiggle{
+      0%{ transform: scale(1) rotate(0deg); }
+      20%{ transform: scale(1.05) rotate(-3deg); }
+      40%{ transform: scale(1.08) rotate(3deg); }
+      60%{ transform: scale(1.05) rotate(-2deg); }
+      80%{ transform: scale(1.03) rotate(2deg); }
+      100%{ transform: scale(1) rotate(0deg); }
+    }
+
+    /* Bubble lucu muncul di atas kartu */
+    .pop{
+      position:absolute;
+      left:50%;
+      top:-10px;
+      transform: translateX(-50%);
+      background:#ff2f7b;
+      color:#fff;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:700;
+      box-shadow:0 10px 20px rgba(0,0,0,0.15);
+      opacity:0;
+      pointer-events:none;
+    }
+    .pop.show{
+      animation: pop .8s ease forwards;
+    }
+    @keyframes pop{
+      0%{ opacity:0; transform:translateX(-50%) translateY(8px) scale(.8); }
+      30%{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
+      100%{ opacity:0; transform:translateX(-50%) translateY(-18px) scale(1.05); }
+    }
+
+    /* Confetti mini (emoji) meletup */
+    .burst{
+      position:fixed;
+      z-index:3;
+      font-size:18px;
+      pointer-events:none;
+      animation: burst 700ms ease-out forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15));
+    }
+    @keyframes burst{
+      0%{ transform:translate(0,0) scale(0.8); opacity:1; }
+      100%{ transform:translate(var(--dx), var(--dy)) scale(1.2); opacity:0; }
+    }
+
+    /* Hati jatuh-jatuh */
+    .heart{
+      position:fixed;
+      top:-40px;
+      left:0;
+      z-index:1;
+      font-size:22px;
+      pointer-events:none;
+      opacity:0.9;
+      animation: fall linear forwards;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,0.15));
+    }
+    @keyframes fall{
+      0%{
+        transform: translateX(var(--x)) translateY(-40px) rotate(0deg);
+        opacity:0;
+      }
+      10%{ opacity:0.95; }
+      100%{
+        transform: translateX(calc(var(--x) + var(--drift))) translateY(110vh) rotate(var(--rot));
+        opacity:0;
+      }
+    }
+
+    .small{
+      font-size:13px;
+      opacity:0.85;
+      margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="pop" id="pop">HEHE 😆💖</div>
+
+    <div class="emoji">💖💘💗💝</div>
+    <h1>Happy Valentine, Elysa Latifah (Ipaww) 😆💌</h1>
+
+    <p id="text">Hai Ipaww! 🌷
+Semoga hari valentine kamu manis kayak permen,
+lucu kayak kamu,
+dan gak drama kayak sinetron jam 7 malam 😆💖
+Jangan lupa senyum ya, nanti dunia ikut baper!</p>
+
+    <div class="btns">
+      <button id="btnGanti" onclick="gantiPesan()">Klik kalau kamu lucu 😜</button>
+      <button id="btnWA" class="wa" onclick="kirimWA()">Kirim ke WhatsApp 📲</button>
+    </div>
+
+    <div class="small">Tip: Klik tombolnya biar ada efek lucu + hati jatuh-jatuh ❤️✨</div>
+  </div>
+
+  <script>
+    const pesan = [
+      "Ipaww! 💕 Kamu tuh kayak WiFi… pas ada bikin hidup tenang, pas gak ada bikin panik 😆",
+      "Elysa Latifah 🌸 kamu bukan coklat valentine, tapi tetep bikin manis tiap hari 💖",
+      "Ipaww, kalau kamu jadi alarm… aku rela bangun pagi tiap hari 😜",
+      "Valentine ini spesial, tapi kamu lebih spesial… walaupun kadang ngeselin dikit 🤭💘",
+      "Ipaww, kamu itu paket komplit: lucu, manis, bikin senyum… tinggal kurangnya cuma satu: aku 😆💝"
+    ];
+
+    const pops = ["HEHE 😆💖","CIEE 😜💘","UWU 💗","BAPER ALERT 🚨💞","IPAWwW! 😆✨"];
+
+    function wiggle(el){
+      el.classList.remove("wiggle");
+      void el.offsetWidth; // restart anim
+      el.classList.add("wiggle");
+      setTimeout(()=>el.classList.remove("wiggle"), 500);
+    }
+
+    function showPop(){
+      const pop = document.getElementById("pop");
+      pop.textContent = pops[Math.floor(Math.random()*pops.length)];
+      pop.classList.remove("show");
+      void pop.offsetWidth;
+      pop.classList.add("show");
+    }
+
+    // Ledakan mini emoji di sekitar tombol
+    function burstAt(x,y){
+      const em = ["💖","💘","💗","✨","😆","🌷","💝"];
+      for(let i=0;i<10;i++){
+        const s = document.createElement("div");
+        s.className = "burst";
+        s.textContent = em[Math.floor(Math.random()*em.length)];
+        s.style.left = x + "px";
+        s.style.top  = y + "px";
+        const dx = (Math.random()*160 - 80) + "px";
+        const dy = (Math.random()*-160 - 40) + "px";
+        s.style.setProperty("--dx", dx);
+        s.style.setProperty("--dy", dy);
+        document.body.appendChild(s);
+        setTimeout(()=>s.remove(), 800);
+      }
+    }
+
+    function gantiPesan(){
+      const random = Math.floor(Math.random() * pesan.length);
+      const p = document.getElementById("text");
+      p.textContent = pesan[random];
+
+      const btn = document.getElementById("btnGanti");
+      wiggle(btn);
+      showPop();
+
+      const r = btn.getBoundingClientRect();
+      burstAt(r.left + r.width/2, r.top + r.height/2);
+    }
+
+    function kirimWA(){
+      const text = document.getElementById("text").textContent;
+      const url = "https://wa.me/?text=" + encodeURIComponent(text);
+
+      const btn = document.getElementById("btnWA");
+      wiggle(btn);
+      showPop();
+
+      const r = btn.getBoundingClientRect();
+      burstAt(r.left + r.width/2, r.top + r.height/2);
+
+      window.open(url, "_blank");
+    }
+
+    /* Efek hati jatuh-jatuh terus menerus */
+    function spawnHeart(){
+      const h = document.createElement("div");
+      h.className = "heart";
+      const hearts = ["💖","💗","💘","💝","❤️","💕","✨"];
+      h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+
+      // posisi & animasi random
+      const x = Math.random()*100;        // vw
+      const drift = (Math.random()*80 - 40) + "px";
+      const rot = (Math.random()*360 - 180) + "deg";
+      const dur = (Math.random()*3 + 3);  // 3-6s
+      const size = Math.random()*14 + 16; // 16-30px
+
+      h.style.fontSize = size + "px";
+      h.style.setProperty("--x", x + "vw");
+      h.style.setProperty("--drift", drift);
+      h.style.setProperty("--rot", rot);
+      h.style.animationDuration = dur + "s";
+
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), dur*1000 + 200);
+    }
+
+    // mulai hujan hati
+    setInterval(spawnHeart, 260);
+
+    // bonus: klik layar juga meletup
+    document.addEventListener("click", (e)=>{
+      // jangan spam kalau klik text selection
+      burstAt(e.clientX, e.clientY);
+    }, {passive:true});
+  </script>
+</body>
+</html>
